@@ -3,6 +3,7 @@ import 'package:shake_torch/background_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:torch_light/torch_light.dart';
+import 'package:shake_torch/about_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -141,6 +142,17 @@ class _ShakeTorchHomeState extends State<ShakeTorchHome>
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -271,9 +283,13 @@ class _ShakeTorchHomeState extends State<ShakeTorchHome>
                   const SizedBox(height: 10),
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
+                      trackHeight: 12.0,
                       activeTrackColor: Colors.amber,
                       inactiveTrackColor: Colors.white24,
                       thumbColor: Colors.amber,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 16.0,
+                      ),
                       overlayColor: Colors.amber.withOpacity(0.2),
                       valueIndicatorColor: Colors.amber,
                       valueIndicatorTextStyle: const TextStyle(
@@ -284,7 +300,7 @@ class _ShakeTorchHomeState extends State<ShakeTorchHome>
                       value: sensitivity,
                       min: 1.0,
                       max: 10.0,
-                      divisions: 90,
+                      divisions: 18,
                       label: sensitivity.toStringAsFixed(1),
                       onChanged: _updateSensitivity,
                     ),

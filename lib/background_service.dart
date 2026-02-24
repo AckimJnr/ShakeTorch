@@ -8,6 +8,21 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:torch_light/torch_light.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Called when a notification action is tapped while the app is in background.
+/// Must be a top-level function with the vm:entry-point pragma.
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse response) async {
+  if (response.actionId == 'stop_action') {
+    // Turn off the torch before stopping
+    try {
+      await TorchLight.disableTorch();
+    } catch (_) {}
+    // Stop the background service
+    final service = FlutterBackgroundService();
+    service.invoke('stopService');
+  }
+}
+
 @pragma('vm:entry-point')
 Future<void> initializeService() async {
   print("FLUTTER_BACKGROUND_SERVICE: initializeService called");
@@ -69,6 +84,21 @@ void onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  // Initialize with our background action handler
+  await flutterLocalNotificationsPlugin.initialize(
+    settings: const InitializationSettings(
+      android: AndroidInitializationSettings('ic_bg_service_small'),
+    ),
+    onDidReceiveNotificationResponse: (response) async {
+      if (response.actionId == 'stop_action') {
+        try {
+          await TorchLight.disableTorch();
+        } catch (_) {}
+        service.stopSelf();
+      }
+    },
+    onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+  );
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
@@ -97,18 +127,32 @@ void onStart(ServiceInstance service) async {
       >()
       ?.createNotificationChannel(channel);
 
-  // Show the notification to ensure the service is foregrounded
-  // Show the notification to ensure the service is foregrounded
+  // Build the close action that broadcasts to StopServiceReceiver
+  const AndroidNotificationAction closeAction = AndroidNotificationAction(
+    'stop_action',
+    'Close',
+    showsUserInterface: false,
+    cancelNotification: true,
+  );
+
+  // Show the notification with the app logo as the large icon and a close button
   await flutterLocalNotificationsPlugin.show(
     id: 888,
-    title: 'ShakeTorch Service',
+    title: 'ShakeTorch',
     body: 'Shake detection is active',
-    notificationDetails: const NotificationDetails(
+    notificationDetails: NotificationDetails(
       android: AndroidNotificationDetails(
         'shake_torch_service',
         'ShakeTorch Service',
+        channelDescription: 'Running in background to detect shakes',
         icon: 'ic_bg_service_small',
+        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ongoing: true,
+        autoCancel: false,
+        actions: [closeAction],
+        styleInformation: const BigTextStyleInformation(
+          'Shake your phone to toggle the flashlight.',
+        ),
       ),
     ),
   );

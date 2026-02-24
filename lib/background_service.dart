@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 import 'dart:math';
 
@@ -17,9 +18,8 @@ void notificationTapBackground(NotificationResponse response) async {
     try {
       await TorchLight.disableTorch();
     } catch (_) {}
-    // Stop the background service
-    final service = FlutterBackgroundService();
-    service.invoke('stopService');
+    // Kill the entire app process (service + UI)
+    exit(0);
   }
 }
 
@@ -94,7 +94,8 @@ void onStart(ServiceInstance service) async {
         try {
           await TorchLight.disableTorch();
         } catch (_) {}
-        service.stopSelf();
+        // Kill the entire app process (service + UI)
+        exit(0);
       }
     },
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,

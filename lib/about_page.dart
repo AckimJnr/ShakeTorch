@@ -8,8 +8,8 @@ class AboutPage extends StatelessWidget {
   // Function to launch URLs
   Future<void> _launchUrl(String url) async {
     final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri)) {
-      throw Exception('Could not launch $url');
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $url');
     }
   }
 
@@ -17,11 +17,11 @@ class AboutPage extends StatelessWidget {
   Future<void> _sendEmail() async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'thefossildream@gmail.com', // TODO: Replace with actual email
-      query: 'subject=Report Issue/Feedback',
+      path: 'thefossildream@gmail.com',
+      query: Uri.encodeFull('subject=Report Issue/Feedback - ShakeTorch'),
     );
     if (!await launchUrl(emailLaunchUri)) {
-      throw Exception('Could not launch email client');
+      debugPrint('Could not launch email client');
     }
   }
 
@@ -118,7 +118,7 @@ class AboutPage extends StatelessWidget {
                   _SocialIcon(
                     icon: FontAwesomeIcons.youtube,
                     onTap: () =>
-                        _launchUrl('https://youtube.com/c/yourchannel'),
+                        _launchUrl('https://youtube.com/@code_is_power'),
                   ),
                   _SocialIcon(
                     icon: FontAwesomeIcons.instagram,

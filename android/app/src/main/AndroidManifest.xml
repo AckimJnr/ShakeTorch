@@ -43,7 +43,7 @@
             android:name=".StopServiceReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.example.shake_torch.STOP_SERVICE"/>
+                <action android:name="com.ackimjnr.shake_torch.STOP_SERVICE"/>
             </intent-filter>
         </receiver>
 

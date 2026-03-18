@@ -1,4 +1,4 @@
-package com.example.shake_torch
+package com.ackimjnr.shake_torch
 
 import android.content.BroadcastReceiver
 import android.content.Context

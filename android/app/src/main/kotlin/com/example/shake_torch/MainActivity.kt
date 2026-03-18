@@ -1,4 +1,4 @@
-package com.example.shake_torch
+package com.ackimjnr.shake_torch
 
 import io.flutter.embedding.android.FlutterActivity
 
